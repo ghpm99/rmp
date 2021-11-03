@@ -1,2 +1,2 @@
-# rmt
+# rmp
 Remote Media Player
