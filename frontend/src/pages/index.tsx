@@ -1,14 +1,11 @@
 import React from 'react';
-import Footer from '../components/footer';
-import Header from '../components/header';
+import { Container } from './styles';
 
-function App(props: any) {
+function App() {
     return (
-        <>
-            <Header />
-            <div>teste</div>
-            <Footer />
-        </>
+        <Container>
+            teste
+        </Container>
     )
 }
 

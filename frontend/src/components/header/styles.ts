@@ -1,10 +1,9 @@
 import styled from "styled-components";
 
-export const Container = styled.footer`
+export const Container = styled.header`
 background-color: #222831;
 align-self: auto;
 color:#EEEEEE;
-padding: 15px;
 `;
 
 export const List = styled.ul`
@@ -17,10 +16,14 @@ export const List = styled.ul`
   margin-top: 0;
   display: flex;
   justify-content: space-between;
+  a {
+    color:#EEEEEE;
+    text-decoration: none;
+  }
 `;
 
 export const ItemList = styled.li`
-  padding: 20px;
+  padding: 10px;
   cursor: pointer;
   &:hover{
     background-color: #393E46;
