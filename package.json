@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "scss": "node-sass ./rmp/static/scss -o ./rmp/static/css"
+  },
+  "dependencies": {
+    "node-sass": "^6.0.1"
+  }
+}
