@@ -43,7 +43,8 @@ a {
     text-decoration: none !important; }
 
 .content {
-  height: 70vh; }
+  color: white;
+  margin: 0 10vw 0 10vw; }
 
 .hero {
   height: 100vh;
@@ -496,3 +497,10 @@ a {
     padding-top: 50px;
     text-align: center;
     color: #777; }
+
+.media-table {
+  margin: auto;
+  text-align: center; }
+  .media-table .media-row:hover {
+    color: black;
+    background-color: white; }

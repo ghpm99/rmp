@@ -43,7 +43,8 @@ a {
     text-decoration: none !important; }
 
 .content {
-  height: 70vh; }
+  color: white;
+  margin: 0 10vw 0 10vw; }
 
 .hero {
   height: 100vh;
@@ -55,7 +56,7 @@ a {
 .site-navbar {
   margin-bottom: 0px;
   z-index: 1999;
-  padding: 16px;
+  padding: 30px;
   width: 100%; }
   .site-navbar .container-fluid {
     padding-left: 7rem;
@@ -496,3 +497,10 @@ a {
     padding-top: 50px;
     text-align: center;
     color: #777; }
+
+.media-table {
+  margin: auto;
+  text-align: center; }
+  .media-table .media-row:hover {
+    color: black;
+    background-color: white; }
