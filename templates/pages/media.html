@@ -1,0 +1,80 @@
+{% extends '../base.html' %}
+{% block content %}
+<div>
+    Media em reprodução: {{ media }}
+</div>
+<div>
+    Lista de reprodução:
+    <div>
+        <table class="media-table">
+            <thead>
+                <tr>
+                    <th>
+                        Ordem
+                    </th>
+                    <th>
+                        Nome do arquivo
+                    </th>
+                    <th>
+                        Caminho do arquivo
+                    </th>
+                    <th>
+                        Tipo de arquivo
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for media in media_list %}
+                <tr>
+                    <td>
+                        {{ media.order }}
+                    </td>
+                    <td>
+                        {{ media.name }}
+                    </td>
+                    <td>
+                        {{ media.file_path }}
+                    </td>
+                    <td>
+                        {{ media.file_type }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div>
+    Arquivos:
+    <div>
+        <table class="media-table">
+            <thead>
+                <tr>
+                    <th>
+                        Nome do arquivo
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in media_files %}
+                <tr class="media-row">
+                    <td>
+                        {{ file }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <input type="button" value="Adicionar" />
+    </div>
+</div>
+<div>
+    Controles:
+    <div>
+        <input type="button" value="Play" />
+        <input type="button" value="Pause" />
+    </div>
+</div>
+{% endblock %}

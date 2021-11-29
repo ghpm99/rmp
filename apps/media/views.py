@@ -1,12 +1,14 @@
 from django.shortcuts import render
-
-from rmp.settings import PUSHER_CLIENT
+import os
+from media.models import Media
+from rmp.local_settings import CAMINHO_MEDIAS
 
 
 # Create your views here.
 def index(request):
-    PUSHER_CLIENT.trigger('rmp', 'mediafilesrequest', {})
     context = {
-        'text': 'testes2'
+        'media': 'N/A',
+        'media_list': Media.objects.all(),
+        'media_files': os.listdir(CAMINHO_MEDIAS)
     }
     return render(request, 'pages/media.html', context=context)
