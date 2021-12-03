@@ -1,8 +1,12 @@
-from posixpath import basename
-from django.urls import path
-from . import views
 
+from django.urls import include, path
+from rest_framework import routers
+
+from media_socket.views import EventsViewSet
+
+router = routers.DefaultRouter()
+router.register('event', EventsViewSet, basename='Event')
 
 urlpatterns = [
-    path('', views.socket, name='socket')
+    path('', include(router.urls))
 ]

@@ -1,0 +1,6 @@
+{
+    "terminal.integrated.defaultProfile.windows": "Ubuntu (WSL)",
+    "python.analysis.extraPaths": [
+        "./apps"
+    ]
+}

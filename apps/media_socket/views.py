@@ -1,6 +1,8 @@
-from django.http import JsonResponse
+from rest_framework import viewsets
+from media_socket.models import Event
+from media_socket.serializer import EventSerializer
 
 
-def socket(request):
-    if(request.method == 'GET'):
-        return JsonResponse({'message': 'Hello World!'})
+class EventsViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer

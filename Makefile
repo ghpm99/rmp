@@ -1,3 +1,6 @@
 build:
 	# Build the backend
-	./manage.py collectstatic --no-input
+	npm run scss
+	python ./manage.py collectstatic --no-input
+run:
+	python ./manage.py runserver
