@@ -13,27 +13,29 @@
     <div class="row align-items-center">
       <div class="site-logo col-6"><a href="{% url 'index' %}">RMP</a></div>
       <nav class="mx-auto site-navigation">
+        {% with request.resolver_match.url_name as url_name %}
         <ul class="site-menu js-clone-nav d-none d-xl-block ml-0 pl-0">
-          <li><a href="{% url 'index' %}" class="nav-link active">Inicio</a></li>
-          <li><a href="{% url 'media' %}">Media</a></li>
+          <li><a href="{% url 'index' %}" class="{% if url_name == 'index' %}nav-link active{% endif %}">Inicio</a></li>
+          <li><a href="{% url 'media' %}" class="{% if url_name == 'media' %}nav-link active{% endif %}">Media</a></li>
           <li class="has-children">
-            <a href="{% url 'web' %}">Web</a>
+            <a href="{% url 'web' %}" class="{% if url_name == 'web' or url_name == 'youtube' or url_name == 'navigation' %}nav-link active{% endif %}">Web</a>
             <ul class="dropdown">
-              <li><a href="{% url 'youtube' %}">Youtube</a></li>
-              <li><a href="{% url 'navigation' %}">Navegação</a></li>
+              <li><a href="{% url 'youtube' %}" class="{% if url_name == 'youtube' %}nav-link active{% endif %}">Youtube</a></li>
+              <li><a href="{% url 'navigation' %}" class="{% if url_name == 'navigation' %}nav-link active{% endif %}">Navegação</a></li>
             </ul>
           </li>
           <li class="has-children">
-            <a href="{% url 'routines' %}">Rotinas</a>
+            <a href="{% url 'routines' %}" class="{% if url_name == 'routines' or url_name == 'kanban' or url_name == 'financial' %}nav-link active{% endif %}">Rotinas</a>
             <ul class="dropdown">
-              <li><a href="{% url 'kanban' %}">Kanban</a></li>
-              <li><a href="{% url 'financial' %}">Financeiro</a></li>
+              <li><a href="{% url 'kanban' %}" class="{% if url_name == 'kanban' %}nav-link active{% endif %}">Kanban</a></li>
+              <li><a href="{% url 'financial' %}" class="{% if url_name == 'financial' %}nav-link active{% endif %}">Financeiro</a></li>
             </ul>
           </li>
-          <li><a href="{% url 'server' %}">Servidor</a></li>
-          <li><a href="{% url 'status' %}">Status</a></li>
+          <li><a href="{% url 'server' %}" class="{% if url_name == 'server' %}nav-link active{% endif %}">Servidor</a></li>
+          <li><a href="{% url 'status' %}" class="{% if url_name == 'status' %}nav-link active{% endif %}">Status</a></li>
           <li class="d-lg-none"><a href="{% url 'login' %}">Log In</a></li>
         </ul>
+        {% endwith %}
       </nav>
       <div class="right-cta-menu text-right d-flex aligin-items-center col-6">
         <div class="ml-auto">

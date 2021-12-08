@@ -2,5 +2,7 @@
     "terminal.integrated.defaultProfile.windows": "Ubuntu (WSL)",
     "python.analysis.extraPaths": [
         "./apps"
-    ]
+    ],
+    "typescript.preferences.quoteStyle": "double",
+    "javascript.preferences.quoteStyle": "double"
 }

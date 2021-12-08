@@ -3,6 +3,7 @@
     "scss": "node-sass ./templates/scss -o ./rmp/static/css"
   },
   "dependencies": {
+    "bootstrap": "^5.1.3",
     "node-sass": "^6.0.1"
   }
 }

@@ -8,9 +8,11 @@ def index(request):
     }
     return render(request, 'pages/web.html', context=context)
 
+
 def youtube(request):
 
     return render(request, 'pages/youtube.html')
+
 
 def navigation(request):
 
