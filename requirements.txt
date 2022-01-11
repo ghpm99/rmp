@@ -14,6 +14,7 @@ docker-compose==1.29.2
 dockerpty==0.4.1
 docopt==0.6.2
 flake8==4.0.1
+gunicorn==20.1.0
 idna==3.3
 importlib-metadata==4.8.2
 jsonschema==3.2.0
