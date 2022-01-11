@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -151,9 +152,9 @@ PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, '../apps'))
 
 PUSHER_CLIENT = pusher.Pusher(
-    app_id= os.environ.get('ENV_PUSHER_APP_ID'),
-    key= os.environ.get('ENV_PUSHER_KEY'),
-    secret= os.environ.get('ENV_PUSHER_SECRET'),
-    cluster= os.environ.get('ENV_PUSHER_CLUSTER'),
+    app_id=os.environ.get('ENV_PUSHER_APP_ID'),
+    key=os.environ.get('ENV_PUSHER_KEY'),
+    secret=os.environ.get('ENV_PUSHER_SECRET'),
+    cluster=os.environ.get('ENV_PUSHER_CLUSTER'),
     ssl=True
 )
