@@ -16,7 +16,6 @@ from pathlib import Path
 
 import pusher
 
-from rmp.local_settings import PUSHER_APP_ID, PUSHER_CLUSTER, PUSHER_KEY, PUSHER_SECRET
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -152,9 +151,9 @@ PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, '../apps'))
 
 PUSHER_CLIENT = pusher.Pusher(
-    app_id=PUSHER_APP_ID,
-    key=PUSHER_KEY,
-    secret=PUSHER_SECRET,
-    cluster=PUSHER_CLUSTER,
+    app_id= os.environ.get('ENV_PUSHER_APP_ID'),
+    key= os.environ.get('ENV_PUSHER_KEY'),
+    secret= os.environ.get('ENV_PUSHER_SECRET'),
+    cluster= os.environ.get('ENV_PUSHER_CLUSTER'),
     ssl=True
 )
