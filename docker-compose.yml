@@ -1,13 +1,23 @@
-db:
-  image: postgres
-  environment:
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=1234
       - POSTGRES_DB=rmp
-web:
-  build: .
-  command: python manage.py runserver 0.0.0.0:8000
-  ports:
-    - "8000:8000"
-  links:
-  - db
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: django
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/rmp
+    ports:
+      - "8000:8000"
+    links:
+      - postgres
+    depends_on:
+      - postgres

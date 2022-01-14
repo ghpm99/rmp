@@ -1,7 +1,13 @@
-FROM python:3.8.10
+FROM python:3.9.7
 ENV PYTHONUNBUFFERED 1
-RUN mkdir /code
-WORKDIR /code
-ADD requirements.txt /code/
+ENV ENV_PUSHER_APP_ID 1293347
+ENV ENV_PUSHER_KEY 9dec5b5683e896354b90
+ENV ENV_PUSHER_SECRET c6204a7654bd1be57d0c
+ENV ENV_PUSHER_CLUSTER us2
+ENV CAMINHO_MEDIAS /mnt/e/Musicas/
+RUN mkdir /rmp
+WORKDIR /rmp
+ADD requirements.txt /rmp/
 RUN pip install -r requirements.txt
-ADD . /code/
+ADD . /rmp/
+EXPOSE 8000
