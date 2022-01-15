@@ -16,6 +16,7 @@ from pathlib import Path
 
 import pusher
 import django_heroku
+import dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -96,6 +97,9 @@ DATABASES = {
         'HOST': os.environ['DATABASE_HOST']
     }
 }
+
+db_from_env = dj_database_url.config(conn_max_age=600)
+DATABASES['default'].update(db_from_env)
 
 django_heroku.settings(locals())
 
