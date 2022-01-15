@@ -89,10 +89,9 @@ WSGI_APPLICATION = 'rmp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'rmp',
+        'NAME': os.environ['DATABASE_NAME'],
         'USER': os.environ['DATABASE_USER'],
-        'PASSWORD': os.environ['DATABASE_PASSWORD'],
-        'HOST': os.environ['DATABASE_NAME']
+        'PASSWORD': os.environ['DATABASE_PASSWORD']
     }
 }
 
