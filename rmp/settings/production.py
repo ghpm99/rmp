@@ -33,3 +33,5 @@ PUSHER_CLIENT = pusher.Pusher(
     cluster=os.environ.get('ENV_PUSHER_CLUSTER'),
     ssl=True
 )
+
+ALLOWED_HOSTS = ['rmp-server.herokuapp.com', '0.0.0.0']
