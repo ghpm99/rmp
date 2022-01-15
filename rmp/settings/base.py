@@ -26,11 +26,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Application definition
 
 INSTALLED_APPS = [
-    'media_socket',
-    'routines',
-    'server',
-    'status',
-    'web',
+    'apps.media_socket',
+    'apps.routines',
+    'apps.server',
+    'apps.status',
+    'apps.web',
     'apps.media',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -126,3 +126,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, '../../apps'))
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
