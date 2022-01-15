@@ -15,6 +15,7 @@ import sys
 from pathlib import Path
 
 import pusher
+import django_heroku
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -95,6 +96,8 @@ DATABASES = {
         'HOST': os.environ['DATABASE_HOST']
     }
 }
+
+django_heroku.settings(locals())
 
 
 # Password validation
