@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from .forms import SendVideoForm
+
+from web.models import Youtube
 
 
 # Create your views here.
@@ -10,8 +13,20 @@ def index(request):
 
 
 def youtube(request):
+    if(request.method == 'POST'):
+        form = SendVideoForm(request.POST)
+        if(form.is_valid()):
 
-    return render(request, 'pages/youtube.html')
+            print(form)
+    else:
+        form = SendVideoForm()
+
+    context = {
+        'video_list': Youtube.objects.all(),
+        'form': form
+    }
+    print(context)
+    return render(request, 'pages/youtube.html', context=context)
 
 
 def navigation(request):

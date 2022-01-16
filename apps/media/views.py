@@ -8,6 +8,6 @@ def index(request):
     context = {
         'media': 'N/A',
         'media_list': Media.objects.all(),
-        'media_files': os.listdir('')
+        'media_files': ''
     }
     return render(request, 'pages/media.html', context=context)
