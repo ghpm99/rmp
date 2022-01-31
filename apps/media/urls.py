@@ -7,4 +7,5 @@ urlpatterns = [
     path(
         'get-media-playing', views.get_media_playing, name='media_api_playing'
         ),
+    path('webhook', views.pusher_webhook, name='media_api_webhook')
 ]

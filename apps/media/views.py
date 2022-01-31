@@ -1,9 +1,10 @@
 from django.http import JsonResponse, request
 from django.shortcuts import render
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from media.models import Media
 from rmp.decorators import add_cors_react_dev
 from rmp.utils import paginate
+from pusher import Pusher
 
 
 # Create your views here.
@@ -47,3 +48,17 @@ def get_media_playing(request: request) -> JsonResponse:
             'name': 'N/a'
         }
     return JsonResponse(media)
+
+
+@add_cors_react_dev
+@require_POST
+def pusher_webhook(request: request):
+    webhook = Pusher.validate_webhook(
+        key=request.headers.get('X-Pusher-Key'),
+        signature=request.headers.get('X-Pusher-Signature'),
+        body=request.data
+    )
+
+    print(webhook)
+
+    return 'ok'
