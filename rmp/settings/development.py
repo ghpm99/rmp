@@ -12,7 +12,7 @@ load_dotenv()
 DEBUG = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4#5_h&!mn1v^d0bzvvk_1p5rq^!yj6p&e@j+oq_x(t+h*_u#zv'
+SECRET_KEY = LOCAL_SECRET_KEY
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
