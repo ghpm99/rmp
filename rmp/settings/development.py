@@ -1,11 +1,12 @@
-import pusher
-from rmp.settings import local_settings
+from dotenv import load_dotenv
 from rmp.settings.base import *
 
 try:
     from rmp.settings.local_settings import *
 except ImportError:
     pass
+
+load_dotenv()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -25,13 +26,5 @@ DATABASES = {
         'HOST': 'postgres'
     }
 }
-
-PUSHER_CLIENT = pusher.Pusher(
-    app_id=local_settings.ENV_PUSHER_APP_ID,
-    key=local_settings.ENV_PUSHER_KEY,
-    secret=local_settings.ENV_PUSHER_SECRET,
-    cluster=local_settings.ENV_PUSHER_CLUSTER,
-    ssl=True
-)
 
 ALLOWED_HOSTS = ['*']

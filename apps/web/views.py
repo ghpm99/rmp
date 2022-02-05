@@ -3,7 +3,6 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from rmp.decorators import add_cors_react_dev
 from django.shortcuts import render
-
 from .forms import SendVideoForm
 
 from web.models import Youtube
@@ -43,4 +42,5 @@ def navigation(request):
 @add_cors_react_dev
 @require_POST
 def change_screen(request) -> JsonResponse:
+
     return JsonResponse({'msg': 'ok'})

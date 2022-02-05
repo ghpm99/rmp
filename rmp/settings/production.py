@@ -1,7 +1,6 @@
 import os
 import django_heroku
 import dj_database_url
-import pusher
 from rmp.settings.base import *
 
 
@@ -25,13 +24,5 @@ db_from_env = dj_database_url.config(conn_max_age=600)
 DATABASES['default'].update(db_from_env)
 
 django_heroku.settings(locals())
-
-PUSHER_CLIENT = pusher.Pusher(
-    app_id=os.environ.get('ENV_PUSHER_APP_ID'),
-    key=os.environ.get('ENV_PUSHER_KEY'),
-    secret=os.environ.get('ENV_PUSHER_SECRET'),
-    cluster=os.environ.get('ENV_PUSHER_CLUSTER'),
-    ssl=True
-)
 
 ALLOWED_HOSTS = ['rmp-server.herokuapp.com', '0.0.0.0']
