@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'apps.status',
     'apps.web',
     'apps.media',
+    'apps.remote',
     'apps.pusher_webhook',
     'django.contrib.admin',
     'django.contrib.auth',

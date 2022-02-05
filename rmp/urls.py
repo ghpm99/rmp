@@ -13,5 +13,6 @@ urlpatterns = [
     path('status/', include('status.urls')),
     path('admin/', admin.site.urls),
     path('socket/', include('media_socket.urls')),
-    path('pusher/', include('pusher_webhook.urls'))
+    path('pusher/', include('pusher_webhook.urls')),
+    path('remote/', include('remote.urls')),
 ]
