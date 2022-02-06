@@ -25,4 +25,4 @@ DATABASES['default'].update(db_from_env)
 
 django_heroku.settings(locals())
 
-ALLOWED_HOSTS = ['rmp-server.herokuapp.com', '0.0.0.0']
+ALLOWED_HOSTS = ['rmp-server-dev.herokuapp.com', '0.0.0.0']
