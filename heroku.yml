@@ -1,7 +1,7 @@
 setup:
   addons:
     - plan: heroku-postgresql
-      as: rmp-server-dev
+      as: rmp-server
 build:
   docker:
     web: Dockerfile
