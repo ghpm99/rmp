@@ -5,6 +5,8 @@ setup:
 build:
   docker:
     web: Dockerfile
-release: python manage.py migrate
+release:
+  docker:
+    web: python manage.py migrate
 run:
   web: gunicorn rmp.wsgi
