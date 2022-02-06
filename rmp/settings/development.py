@@ -1,10 +1,7 @@
 from dotenv import load_dotenv
+import os
 from rmp.settings.base import *
 
-try:
-    from rmp.settings.local_settings import *
-except ImportError:
-    pass
 
 load_dotenv()
 
@@ -12,7 +9,7 @@ load_dotenv()
 DEBUG = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = LOCAL_SECRET_KEY
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
