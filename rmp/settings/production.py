@@ -25,5 +25,6 @@ DATABASES = {
 db_from_env = dj_database_url.config(conn_max_age=600)
 DATABASES['default'].update(db_from_env)
 
+BASE_URL = os.environ.get('BASE_URL')
 
-ALLOWED_HOSTS = ['rmp-server-dev.herokuapp.com', '0.0.0.0']
+ALLOWED_HOSTS = [BASE_URL, '0.0.0.0']
