@@ -3,4 +3,4 @@ build:
 	npm run scss
 	python ./manage.py collectstatic --no-input
 run:
-	python ./manage.py runserver
+	python ./manage.py runserver --settings=rmp.settings.development
