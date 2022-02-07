@@ -13,7 +13,7 @@ pusher_client = pusher.Pusher(
 
 
 def send_command(command):
-    pusher_client.trigger('krill', 'command', {'cmd': command})
+    pusher_client.trigger('private-display', 'command', {'cmd': command})
 
 
 def webhook(request):
@@ -40,3 +40,8 @@ def webhook(request):
     print(webhook)
 
     return JsonResponse({'msg': 'ok'})
+
+
+def auth(request, channel_name, socket_id):
+    auth_response = pusher_client.authenticate(channel=channel_name, socket_id=socket_id)
+    return JsonResponse(auth_response)
