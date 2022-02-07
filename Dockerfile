@@ -14,7 +14,6 @@ ADD requirements.txt /rmp/
 RUN pip install -r requirements.txt
 
 ADD . /rmp/
-ADD ./.profile.d /app/.profile.d
 
 RUN python manage.py migrate --noinput
 
