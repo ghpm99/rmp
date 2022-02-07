@@ -10,6 +10,8 @@ DEBUG = True
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
+django_heroku.settings(locals())
+
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -23,6 +25,5 @@ DATABASES = {
 db_from_env = dj_database_url.config(conn_max_age=600)
 DATABASES['default'].update(db_from_env)
 
-django_heroku.settings(locals())
 
 ALLOWED_HOSTS = ['rmp-server-dev.herokuapp.com', '0.0.0.0']

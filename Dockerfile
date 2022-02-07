@@ -3,6 +3,7 @@ FROM python:3.9.7
 
 # set environment variables
 ENV PYTHONUNBUFFERED 1
+ENV DJANGO_SETTINGS_MODULE rmp.settings.production
 
 RUN mkdir /rmp
 
@@ -14,7 +15,5 @@ ADD requirements.txt /rmp/
 RUN pip install -r requirements.txt
 
 ADD . /rmp/
-
-RUN python manage.py migrate --noinput
 
 EXPOSE 8000
