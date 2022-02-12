@@ -11,7 +11,8 @@ from django.views.decorators.http import require_POST
 @add_cors_react_dev
 @require_POST
 @validate_user
-def send_command_view(request):
+def send_command_view(request, user):
+    print(user)
     print(request)
     pusher.send_command(json.loads(request.body).get('cmd'))
     return JsonResponse({'msg': 'ok'})
