@@ -12,7 +12,5 @@ from django.views.decorators.http import require_POST
 @require_POST
 @validate_user
 def send_command_view(request, user):
-    print(user)
-    print(request)
     pusher.send_command(json.loads(request.body).get('cmd'))
     return JsonResponse({'msg': 'ok'})

@@ -1,4 +1,3 @@
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rmp.decorators import add_cors_react_dev, validate_user
 from django.views.decorators.http import require_POST
@@ -17,8 +16,6 @@ def pusher_webhook(request):
 @require_POST
 @validate_user
 def pusher_auth(request, user):
-    if(user.is_staff is False):
-        return JsonResponse({'msg': 'user is not authorized'}, status=403)
     values = request.body.decode('utf-8').split('&')
     socket_id = ''
     channel_name = ''
