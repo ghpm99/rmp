@@ -23,4 +23,5 @@ def send_command_view(request, user):
 @validate_user
 def screen_size_view(request, user):
     screen_size = get_object_or_404(Config, type=Config.CONFIG_SCREEN)
-    return JsonResponse(screen_size.value)
+    data = json.loads(screen_size.value)
+    return JsonResponse(data)
