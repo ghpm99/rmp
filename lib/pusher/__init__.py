@@ -39,7 +39,8 @@ def client_event(event):
         if(config is None):
             screen_data = Config(type=Config.CONFIG_SCREEN, value=data)
             screen_data.save()
-        config.change('value', data)
+        config.value = data
+        config.save()
         print(data)
 
 
