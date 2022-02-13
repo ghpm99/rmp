@@ -1,6 +1,9 @@
+import json
 import os
 from django.http import JsonResponse
 import pusher
+from remote.models import Config
+
 
 pusher_client = pusher.Pusher(
     app_id=os.environ.get('ENV_PUSHER_APP_ID'),
@@ -18,15 +21,26 @@ def send_command(command):
 def channel_occupied(event):
     if(event["channel"] == 'private-status'):
         pusher_client.trigger('private-events', 'status-channel', {'occupied': True})
+    elif(event["channel"] == 'private-remote'):
+        pusher_client.trigger('private-events', 'remote-channel', {'occupied': True})
 
 
 def channel_vacated(event):
     if(event["channel"] == 'private-status'):
         pusher_client.trigger('private-events', 'status-channel', {'occupied': False})
+    elif(event["channel"] == 'private-remote'):
+        pusher_client.trigger('private-events', 'remote-channel', {'occupied': False})
 
 
 def client_event(event):
-    print(event)
+    if(event['event'] == 'client-screen'):
+        data = json.loads(event['data'])
+        config = Config.objects.filter(type=Config.CONFIG_SCREEN).first()
+        if(config is None):
+            screen_data = Config(type=Config.CONFIG_SCREEN, value=data)
+            screen_data.save()
+        config.change('value', data)
+        print(data)
 
 
 def webhook(request):
