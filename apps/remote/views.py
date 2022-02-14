@@ -8,7 +8,6 @@ from rmp.decorators import add_cors_react_dev, validate_user
 from django.views.decorators.http import require_POST, require_GET
 
 
-# Create your views here.
 @csrf_exempt
 @add_cors_react_dev
 @require_POST
@@ -25,3 +24,48 @@ def screen_size_view(request, user):
     screen_size = get_object_or_404(Config, type=Config.CONFIG_SCREEN)
     data = json.loads(screen_size.value)
     return JsonResponse(data)
+
+
+@csrf_exempt
+@add_cors_react_dev
+@require_POST
+@validate_user
+def hotkey_view(request, user):
+    data = json.loads(request.body)
+    hotkey = data.get('hotkey')
+    pusher.send_hotkey(hotkey)
+    return JsonResponse({'msg': 'Ok'})
+
+
+@csrf_exempt
+@add_cors_react_dev
+@require_POST
+@validate_user
+def key_press_view(request, user):
+    data = json.loads(request.body)
+    keys = data.get('keys')
+    pusher.send_key_press(keys)
+    return JsonResponse({'msg': 'Ok'})
+
+
+@csrf_exempt
+@add_cors_react_dev
+@require_POST
+@validate_user
+def mouse_move_view(request, user):
+    data = json.loads(request.body)
+    x = data.get('x')
+    y = data.get('y')
+    pusher.mouse_move(x, y)
+    return JsonResponse({'msg': 'Ok'})
+
+
+@csrf_exempt
+@add_cors_react_dev
+@require_POST
+@validate_user
+def mouse_button_view(request, user):
+    data = json.loads(request.body)
+    button = data.get('button')
+    pusher.mouse_button(button)
+    return JsonResponse({'msg': 'Ok'})

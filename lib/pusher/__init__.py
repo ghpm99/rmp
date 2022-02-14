@@ -40,7 +40,6 @@ def client_event(event):
             screen_data.save()
         config.value = data
         config.save()
-        print(data)
 
 
 def webhook(request):
@@ -67,3 +66,19 @@ def webhook(request):
 def auth(request, channel_name, socket_id):
     auth_response = pusher_client.authenticate(channel=channel_name, socket_id=socket_id)
     return JsonResponse(auth_response)
+
+
+def send_hotkey(hotkey):
+    pusher_client.trigger('private-display', 'hotkey', {'hotkey': hotkey})
+
+
+def send_key_press(keys):
+    pusher_client.trigger('private-display', 'keypress', {'keys': keys})
+
+
+def mouse_move(x, y):
+    pusher_client.trigger('private-display', 'mouse-move', {'x': x, 'y': y})
+
+
+def mouse_button(button):
+    pusher_client.trigger('private-display', 'mouse-button', {'button': button})
