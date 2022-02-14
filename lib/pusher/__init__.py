@@ -1,4 +1,3 @@
-import json
 import os
 from django.http import JsonResponse
 import pusher
@@ -34,7 +33,7 @@ def channel_vacated(event):
 
 def client_event(event):
     if(event['event'] == 'client-screen'):
-        data = json.loads(event['data'])
+        data = event['data']
         config = Config.objects.filter(type=Config.CONFIG_SCREEN).first()
         if(config is None):
             screen_data = Config(type=Config.CONFIG_SCREEN, value=data)
