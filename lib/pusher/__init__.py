@@ -85,4 +85,4 @@ def mouse_button(button):
 
 
 def notify_screenshot():
-    pusher_client.trigger('private-remote', 'new-screenshot')
+    pusher_client.trigger('private-remote', 'new-screenshot', {})
