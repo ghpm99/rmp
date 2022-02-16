@@ -82,3 +82,7 @@ def mouse_move(x, y):
 
 def mouse_button(button):
     pusher_client.trigger('private-display', 'mouse-button', {'button': button})
+
+
+def notify_screenshot():
+    pusher_client.trigger('private-remote', 'new-screenshot')
