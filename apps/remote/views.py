@@ -97,4 +97,6 @@ def save_screenshot_view(request, user):
 
     screenshot.image.save('screenshot.png', File(file), save=True)
 
+    pusher.notify_screenshot()
+
     return JsonResponse({'msg': 'Ok'})
