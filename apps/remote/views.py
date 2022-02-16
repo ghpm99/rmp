@@ -3,9 +3,12 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from lib import pusher
-from remote.models import Config
+from remote.models import Config, Screenshot
 from rmp.decorators import add_cors_react_dev, validate_user
 from django.views.decorators.http import require_POST, require_GET
+from django.core.files import File
+from django.conf import settings
+import os
 
 
 @csrf_exempt
@@ -68,4 +71,30 @@ def mouse_button_view(request, user):
     data = json.loads(request.body)
     button = data.get('button')
     pusher.mouse_button(button)
+    return JsonResponse({'msg': 'Ok'})
+
+
+@csrf_exempt
+@add_cors_react_dev
+@require_POST
+@validate_user
+def save_screenshot_view(request, user):
+    req_files = request.FILES
+    if not req_files.get('image'):
+        return JsonResponse({'msg': 'Nao existe nenhuma imagem anexo'}, status=400)
+
+    fullname = os.path.join(settings.MEDIA_ROOT, 'screenshot/screenshot.png')
+    print(fullname)
+    if os.path.exists(fullname):
+        os.remove(fullname)
+
+    file = request.FILES.get('image').file
+
+    screenshot = Screenshot.objects.filter(id=1).first()
+
+    if screenshot is None:
+        screenshot = Screenshot()
+
+    screenshot.image.save('screenshot.png', File(file), save=True)
+
     return JsonResponse({'msg': 'Ok'})

@@ -7,5 +7,6 @@ urlpatterns = [
     path('hotkey', views.hotkey_view, name='api_remote_hotkey'),
     path('key-press', views.key_press_view, name='api_remote_key_press'),
     path('mouse-move', views.mouse_move_view, name='api_remote_mouse_move'),
-    path('mouse-button', views.mouse_button_view, name='api_remote_mouse_button')
+    path('mouse-button', views.mouse_button_view, name='api_remote_mouse_button'),
+    path('save-screenshot', views.save_screenshot_view, name='api_remote_save_screenshot'),
 ]
