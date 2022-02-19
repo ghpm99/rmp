@@ -26,6 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # Application definition
 
 INSTALLED_APPS = [
+    'apps.financial',
     'apps.remote',
     'apps.pusher_webhook',
     'apps.authentication',
