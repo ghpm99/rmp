@@ -2,7 +2,7 @@ from django.db import models
 
 
 # Create your models here.
-class financial(models.Model):
+class Payment(models.Model):
 
     TYPE_CREDIT = 0
     TYPE_DEBIT = 1
@@ -17,3 +17,5 @@ class financial(models.Model):
     date = models.DateField()
     installments = models.IntegerField()
     payment_date = models.DateField()
+    fixed = models.BooleanField()
+    active = models.BooleanField(default=True)
