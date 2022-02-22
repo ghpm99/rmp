@@ -4,6 +4,8 @@ from rmp.decorators import add_cors_react_dev, validate_user
 from django.views.decorators.csrf import csrf_exempt
 import json
 from financial.models import Payment
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 
 @add_cors_react_dev
@@ -18,7 +20,8 @@ def get_all_view(request, user):
         'date': data.date,
         'installments': data.installments,
         'payment_date': data.payment_date,
-        'fixed': data.fixed
+        'fixed': data.fixed,
+        'value': data.value
     } for data in datas]
     return JsonResponse({'data': payments})
 
@@ -28,14 +31,27 @@ def get_all_view(request, user):
 @validate_user
 @require_POST
 def save_new_view(request, user):
+
     data = json.loads(request.body)
-    payment = Payment(
-        type=data.get('type'),
-        name=data.get('name'),
-        date=data.get('date'),
-        installments=data.get('installments'),
-        payment_date=data.get('payment_date'),
-        fixed=data.get('fixed')
-    )
-    payment.save()
+
+    installments = data.get('installments')
+    payment_date = data.get('payment_date')
+
+    date_format = '%Y-%m-%d'
+
+    for i in range(installments):
+        payment = Payment(
+            type=data.get('type'),
+            name=data.get('name'),
+            date=data.get('date'),
+            installments=i,
+            payment_date=payment_date,
+            fixed=data.get('fixed'),
+            value=data.get('value')
+        )
+        payment.save()
+        date_obj = datetime.strptime(payment_date, date_format)
+        future_payment = date_obj + relativedelta(months=1)
+        payment_date = future_payment.strftime(date_format)
+
     return JsonResponse({'msg': 'Pagamento incluso com sucesso'})
