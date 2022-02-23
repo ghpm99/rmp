@@ -19,7 +19,7 @@ class Payment(models.Model):
     payment_date = models.DateField()
     fixed = models.BooleanField()
     active = models.BooleanField(default=True)
-    value = models.IntegerField(default=0)
+    value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
 
 class Month(models.Model):

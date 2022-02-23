@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
+from financial.utils import calculate_installments
 from rmp.decorators import add_cors_react_dev, validate_user
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -37,6 +38,8 @@ def save_new_view(request, user):
     installments = data.get('installments')
     payment_date = data.get('payment_date')
 
+    value_installments = calculate_installments(data.get('value'), installments)
+
     date_format = '%Y-%m-%d'
 
     for i in range(installments):
@@ -44,10 +47,10 @@ def save_new_view(request, user):
             type=data.get('type'),
             name=data.get('name'),
             date=data.get('date'),
-            installments=i,
+            installments=i + 1,
             payment_date=payment_date,
             fixed=data.get('fixed'),
-            value=data.get('value')
+            value=value_installments[i]
         )
         payment.save()
         date_obj = datetime.strptime(payment_date, date_format)
