@@ -5,15 +5,40 @@ from rmp.decorators import add_cors_react_dev, validate_user
 from django.views.decorators.csrf import csrf_exempt
 import json
 from financial.models import Payment
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+
+from rmp.utils import boolean, format_date
 
 
 @add_cors_react_dev
 @validate_user
 @require_GET
 def get_all_view(request, user):
-    datas = Payment.objects.filter(active=True)
+
+    req = request.GET
+    filters = {}
+
+    if req.get('type'):
+        filters['type'] = req.get('type')
+    if req.get('name__icontains'):
+        filters['name__icontains'] = req.get('name__icontains')
+    if req.get('date__gte'):
+        filters['date__gte'] = format_date(req.get('date__gte')) or datetime(2018, 1, 1)
+    if req.get('date__lte'):
+        filters['date__lte'] = format_date(req.get('date__lte')) or datetime.now() + timedelta(days=1)
+    if req.get('installments'):
+        filters['installments'] = req.get('installments')
+    if req.get('payment_date__gte'):
+        filters['payment_date__gte'] = format_date(req.get('payment_date__gte')) or datetime(2018, 1, 1)
+    if req.get('payment_date__lte'):
+        filters['payment_date__lte'] = format_date(req.get('payment_date__lte')) or datetime.now() + timedelta(days=1)
+    if req.get('fixed'):
+        filters['fixed'] = boolean(req.get('fixed'))
+    if req.get('active'):
+        filters['active'] = boolean(req.get('active'))
+
+    datas = Payment.objects.filter(**filters).order_by('payment_date')
 
     payments = [{
         'type': data.type,

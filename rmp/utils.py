@@ -35,3 +35,19 @@ def format_date(string_date: str) -> datetime:
         return datetime.strptime(string_date, '%Y-%m-%d')
     except Exception:
         return None
+
+
+def boolean(string: str) -> bool:
+    try:
+        string = int(string)
+
+        if string == 0:
+            return False
+        if string == 1:
+            return True
+    except Exception:
+        if isinstance(string, str):
+            if string.lower() in ["0", "no", "false"]:
+                return False
+            if string.lower() in ["1", "yes", "true"]:
+                return True
