@@ -12,6 +12,15 @@ class Payment(models.Model):
         (TYPE_DEBIT, 'debit')
     ]
 
+    STATUS_OPEN = 0
+    STATUS_DONE = 1
+
+    STATUS = [
+        (STATUS_OPEN, 'open'),
+        (STATUS_DONE, 'done')
+    ]
+
+    status = models.IntegerField(default=STATUS_OPEN, choices=STATUS)
     type = models.IntegerField(default=TYPE_CREDIT, choices=TYPES)
     name = models.TextField(max_length=255)
     date = models.DateField()
