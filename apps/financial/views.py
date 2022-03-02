@@ -1,3 +1,4 @@
+import math
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from financial.utils import calculate_installments
@@ -7,6 +8,7 @@ import json
 from financial.models import Payment
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+from django.db import connection
 
 from rmp.utils import boolean, format_date
 
@@ -26,15 +28,19 @@ def get_all_view(request, user):
     if req.get('name__icontains'):
         filters['name__icontains'] = req.get('name__icontains')
     if req.get('date__gte'):
-        filters['date__gte'] = format_date(req.get('date__gte')) or datetime(2018, 1, 1)
+        filters['date__gte'] = format_date(
+            req.get('date__gte')) or datetime(2018, 1, 1)
     if req.get('date__lte'):
-        filters['date__lte'] = format_date(req.get('date__lte')) or datetime.now() + timedelta(days=1)
+        filters['date__lte'] = format_date(
+            req.get('date__lte')) or datetime.now() + timedelta(days=1)
     if req.get('installments'):
         filters['installments'] = req.get('installments')
     if req.get('payment_date__gte'):
-        filters['payment_date__gte'] = format_date(req.get('payment_date__gte')) or datetime(2018, 1, 1)
+        filters['payment_date__gte'] = format_date(
+            req.get('payment_date__gte')) or datetime(2018, 1, 1)
     if req.get('payment_date__lte'):
-        filters['payment_date__lte'] = format_date(req.get('payment_date__lte')) or datetime.now() + timedelta(days=1)
+        filters['payment_date__lte'] = format_date(
+            req.get('payment_date__lte')) or datetime.now() + timedelta(days=1)
     if req.get('fixed'):
         filters['fixed'] = boolean(req.get('fixed'))
     if req.get('active'):
@@ -67,7 +73,8 @@ def save_new_view(request, user):
     installments = data.get('installments')
     payment_date = data.get('payment_date')
 
-    value_installments = calculate_installments(data.get('value'), installments)
+    value_installments = calculate_installments(
+        data.get('value'), installments)
 
     date_format = '%Y-%m-%d'
 
@@ -177,3 +184,130 @@ def payoff_detail_view(request, id, user):
     payment.save()
 
     return JsonResponse({'msg': 'Pagamento baixado'})
+
+
+@add_cors_react_dev
+@validate_user
+@require_GET
+def report_payment_view(request, user):
+
+    query = """
+        WITH debit AS (
+            SELECT
+                SUM(value) as debit_total,
+                date_part('year', debit.payment_date) as debit_year,
+                date_part('month', debit.payment_date) as debit_month
+            FROM
+                financial_payment AS debit
+            WHERE type=1 AND status=0 AND active=true AND fixed=false
+            GROUP BY
+                date_part('year', debit.payment_date),
+                date_part('month', debit.payment_date)
+            ORDER BY
+                date_part('year', debit.payment_date),
+                date_part('month', debit.payment_date)
+        ),
+        credit AS (
+            SELECT
+                SUM(value) as credit_total,
+                date_part('year', credit.payment_date) as credit_year,
+                date_part('month', credit.payment_date) as credit_month
+            FROM
+                financial_payment AS credit
+            WHERE type=0 AND status=0 AND active=true AND fixed=false
+            GROUP BY
+                date_part('year', credit.payment_date),
+                date_part('month', credit.payment_date)
+            ORDER BY
+                date_part('year', credit.payment_date),
+                date_part('month', credit.payment_date)
+        ),
+        fixed_debit AS (
+            SELECT
+                SUM(value) as fixed_debit_total,
+                date_part('year', fixed_debit.payment_date) as fixed_debit_year,
+                date_part('month', fixed_debit.payment_date) as fixed_debit_month
+            FROM
+                financial_payment AS fixed_debit
+            WHERE type=1 AND status=0 AND active=true AND fixed=true
+            GROUP BY
+                date_part('year', fixed_debit.payment_date),
+                date_part('month', fixed_debit.payment_date)
+            ORDER BY
+                date_part('year', fixed_debit.payment_date),
+                date_part('month', fixed_debit.payment_date)
+        ),
+        fixed_credit AS (
+            SELECT
+                SUM(value) as fixed_credit_total,
+                date_part('year', fixed_credit.payment_date) as fixed_credit_year,
+                date_part('month', fixed_credit.payment_date) as fixed_credit_month
+            FROM
+                financial_payment AS fixed_credit
+            WHERE type=0 AND status=0 AND active=true AND fixed=true
+            GROUP BY
+                date_part('year', fixed_credit.payment_date),
+                date_part('month', fixed_credit.payment_date)
+            ORDER BY
+                date_part('year', fixed_credit.payment_date),
+                date_part('month', fixed_credit.payment_date)
+        )
+        SELECT
+            date_part('month', payment.payment_date) AS payment_month,
+            date_part('year', payment.payment_date) AS payment_year,
+            debit.debit_total as debit_total,
+            credit.credit_total as credit_total,
+            fixed_debit.fixed_debit_total as fixed_debit_total,
+            fixed_credit.fixed_credit_total as fixed_credit_total
+        FROM
+            financial_payment AS payment
+        LEFT JOIN
+            debit
+            ON
+                debit.debit_year = date_part('year', payment.payment_date)
+            AND
+                debit.debit_month = date_part('month', payment.payment_date)
+        LEFT JOIN
+            credit
+            ON
+                credit.credit_year = date_part('year', payment.payment_date)
+            AND
+                credit.credit_month = date_part('month', payment.payment_date)
+        LEFT JOIN
+            fixed_debit
+            ON
+                fixed_debit.fixed_debit_year = date_part('year', payment.payment_date)
+            AND
+                fixed_debit.fixed_debit_month = date_part('month', payment.payment_date)
+        LEFT JOIN
+            fixed_credit
+            ON
+                fixed_credit.fixed_credit_year = date_part('year', payment.payment_date)
+            AND
+                fixed_credit.fixed_credit_month = date_part('month', payment.payment_date)
+        WHERE status=0 AND active=true
+        GROUP BY
+            date_part('year', payment.payment_date),
+            date_part('month', payment.payment_date),
+            debit_total,
+            credit_total,
+            fixed_debit_total,
+            fixed_credit_total
+        ORDER BY payment_year, payment_month;
+        """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query)
+        datas = cursor.fetchall()
+
+    data = [{
+        'label': str(math.trunc(data[0])) + '/' + str(math.trunc(data[1])),
+        'debit': data[2],
+        'credit': data[3],
+        'fixed_debit': data[4],
+        'fixed_credit': data[5]
+    } for data in datas]
+
+    return JsonResponse({
+        'data': data
+    })
