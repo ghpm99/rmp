@@ -100,3 +100,14 @@ def save_screenshot_view(request, user):
     pusher.notify_screenshot()
 
     return JsonResponse({'msg': 'Ok'})
+
+
+@csrf_exempt
+@add_cors_react_dev
+@require_POST
+@validate_user
+def mouse_scroll_view(request, user):
+    data = json.loads(request.body)
+    value = data.get('value')
+    pusher.mouse_scroll(value)
+    return JsonResponse({'msg': 'Ok'})

@@ -191,7 +191,7 @@ def payoff_detail_view(request, id, user):
 @require_GET
 def report_payment_view(request, user):
 
-    query = """
+    queryOpen = """
         WITH debit AS (
             SELECT
                 SUM(value) as debit_total,
@@ -297,17 +297,87 @@ def report_payment_view(request, user):
         """
 
     with connection.cursor() as cursor:
-        cursor.execute(query)
-        datas = cursor.fetchall()
+        cursor.execute(queryOpen)
+        datasOpen = cursor.fetchall()
 
-    data = [{
+    open = [{
         'label': str(math.trunc(data[0])) + '/' + str(math.trunc(data[1])),
         'debit': data[2],
         'credit': data[3],
         'fixed_debit': data[4],
         'fixed_credit': data[5]
-    } for data in datas]
+    } for data in datasOpen]
+
+    queryClosed = """
+        WITH debit AS (
+            SELECT
+                SUM(value) as debit_total,
+                date_part('year', debit.payment_date) as debit_year,
+                date_part('month', debit.payment_date) as debit_month
+            FROM
+                financial_payment AS debit
+            WHERE type=1 AND status=1 AND active=true
+            GROUP BY
+                date_part('year', debit.payment_date),
+                date_part('month', debit.payment_date)
+            ORDER BY
+                date_part('year', debit.payment_date),
+                date_part('month', debit.payment_date)
+        ),
+        credit AS (
+            SELECT
+                SUM(value) as credit_total,
+                date_part('year', credit.payment_date) as credit_year,
+                date_part('month', credit.payment_date) as credit_month
+            FROM
+                financial_payment AS credit
+            WHERE type=0 AND status=1 AND active=true
+            GROUP BY
+                date_part('year', credit.payment_date),
+                date_part('month', credit.payment_date)
+            ORDER BY
+                date_part('year', credit.payment_date),
+                date_part('month', credit.payment_date)
+        )
+        SELECT
+            date_part('month', payment.payment_date) AS payment_month,
+            date_part('year', payment.payment_date) AS payment_year,
+            debit.debit_total as debit_total,
+            credit.credit_total as credit_total
+        FROM
+            financial_payment AS payment
+        LEFT JOIN
+            debit
+            ON
+                debit.debit_year = date_part('year', payment.payment_date)
+            AND
+                debit.debit_month = date_part('month', payment.payment_date)
+        LEFT JOIN
+            credit
+            ON
+                credit.credit_year = date_part('year', payment.payment_date)
+            AND
+                credit.credit_month = date_part('month', payment.payment_date)
+        WHERE status=1 AND active=true
+        GROUP BY
+            date_part('year', payment.payment_date),
+            date_part('month', payment.payment_date),
+            debit_total,
+            credit_total
+        ORDER BY payment_year, payment_month;
+        """
+
+    with connection.cursor() as cursor:
+        cursor.execute(queryClosed)
+        datasClosed = cursor.fetchall()
+
+    closed = [{
+        'label': str(math.trunc(data[0])) + '/' + str(math.trunc(data[1])),
+        'debit': data[2],
+        'credit': data[3]
+    } for data in datasClosed]
 
     return JsonResponse({
-        'data': data
+        'open': open,
+        'closed': closed
     })
