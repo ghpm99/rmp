@@ -246,12 +246,44 @@ def report_payment_view(request, user):
             ORDER BY
                 date_part('year', credit.payment_date),
                 date_part('month', credit.payment_date)
+        ),
+        fixed_debit AS (
+            SELECT
+                SUM(value) as fixed_debit_total,
+                date_part('year', fixed_debit.payment_date) as fixed_debit_year,
+                date_part('month', fixed_debit.payment_date) as fixed_debit_month
+            FROM
+                financial_payment AS fixed_debit
+            WHERE type=1 AND status=0 AND active=true AND fixed=true
+            GROUP BY
+                date_part('year', fixed_debit.payment_date),
+                date_part('month', fixed_debit.payment_date)
+            ORDER BY
+                date_part('year', fixed_debit.payment_date),
+                date_part('month', fixed_debit.payment_date)
+        ),
+        fixed_credit AS (
+            SELECT
+                SUM(value) as fixed_credit_total,
+                date_part('year', fixed_credit.payment_date) as fixed_credit_year,
+                date_part('month', fixed_credit.payment_date) as fixed_credit_month
+            FROM
+                financial_payment AS fixed_credit
+            WHERE type=0 AND status=0 AND active=true AND fixed=true
+            GROUP BY
+                date_part('year', fixed_credit.payment_date),
+                date_part('month', fixed_credit.payment_date)
+            ORDER BY
+                date_part('year', fixed_credit.payment_date),
+                date_part('month', fixed_credit.payment_date)
         )
         SELECT
             date_part('month', payment.payment_date) AS payment_month,
             date_part('year', payment.payment_date) AS payment_year,
             debit.debit_total as debit_total,
-            credit.credit_total as credit_total
+            credit.credit_total as credit_total,
+            fixed_debit.fixed_debit_total as fixed_debit_open,
+            fixed_credit.fixed_credit_total as fixed_credit_open
         FROM
             financial_payment AS payment
         LEFT JOIN
@@ -266,12 +298,26 @@ def report_payment_view(request, user):
                 credit.credit_year = date_part('year', payment.payment_date)
             AND
                 credit.credit_month = date_part('month', payment.payment_date)
+        LEFT JOIN
+            fixed_debit
+            ON
+                fixed_debit.fixed_debit_year = date_part('year', payment.payment_date)
+            AND
+                fixed_debit.fixed_debit_month = date_part('month', payment.payment_date)
+        LEFT JOIN
+            fixed_credit
+            ON
+                fixed_credit.fixed_credit_year = date_part('year', payment.payment_date)
+            AND
+                fixed_credit.fixed_credit_month = date_part('month', payment.payment_date)
         WHERE status=0 AND active=true
         GROUP BY
             date_part('year', payment.payment_date),
             date_part('month', payment.payment_date),
             debit_total,
-            credit_total
+            credit_total,
+            fixed_debit_total,
+            fixed_credit_total
         ORDER BY payment_year, payment_month;
         """
 
@@ -282,7 +328,9 @@ def report_payment_view(request, user):
     open = [{
         'label': str(math.trunc(data[0])) + '/' + str(math.trunc(data[1])),
         'debit': data[2],
-        'credit': data[3]
+        'credit': data[3],
+        'fixed_debit_open': data[4],
+        'fixed_credit_open': data[5]
     } for data in datas_open]
 
     query_closed = """
