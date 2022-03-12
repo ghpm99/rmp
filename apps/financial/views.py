@@ -1,6 +1,5 @@
 import json
 import math
-import copy
 from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
@@ -247,44 +246,12 @@ def report_payment_view(request, user):
             ORDER BY
                 date_part('year', credit.payment_date),
                 date_part('month', credit.payment_date)
-        ),
-        fixed_debit AS (
-            SELECT
-                SUM(value) as fixed_debit_total,
-                date_part('year', fixed_debit.payment_date) as fixed_debit_year,
-                date_part('month', fixed_debit.payment_date) as fixed_debit_month
-            FROM
-                financial_payment AS fixed_debit
-            WHERE type=1 AND status=0 AND active=true AND fixed=true
-            GROUP BY
-                date_part('year', fixed_debit.payment_date),
-                date_part('month', fixed_debit.payment_date)
-            ORDER BY
-                date_part('year', fixed_debit.payment_date),
-                date_part('month', fixed_debit.payment_date)
-        ),
-        fixed_credit AS (
-            SELECT
-                SUM(value) as fixed_credit_total,
-                date_part('year', fixed_credit.payment_date) as fixed_credit_year,
-                date_part('month', fixed_credit.payment_date) as fixed_credit_month
-            FROM
-                financial_payment AS fixed_credit
-            WHERE type=0 AND status=0 AND active=true AND fixed=true
-            GROUP BY
-                date_part('year', fixed_credit.payment_date),
-                date_part('month', fixed_credit.payment_date)
-            ORDER BY
-                date_part('year', fixed_credit.payment_date),
-                date_part('month', fixed_credit.payment_date)
         )
         SELECT
             date_part('month', payment.payment_date) AS payment_month,
             date_part('year', payment.payment_date) AS payment_year,
             debit.debit_total as debit_total,
-            credit.credit_total as credit_total,
-            fixed_debit.fixed_debit_total as fixed_debit_total,
-            fixed_credit.fixed_credit_total as fixed_credit_total
+            credit.credit_total as credit_total
         FROM
             financial_payment AS payment
         LEFT JOIN
@@ -299,26 +266,12 @@ def report_payment_view(request, user):
                 credit.credit_year = date_part('year', payment.payment_date)
             AND
                 credit.credit_month = date_part('month', payment.payment_date)
-        LEFT JOIN
-            fixed_debit
-            ON
-                fixed_debit.fixed_debit_year = date_part('year', payment.payment_date)
-            AND
-                fixed_debit.fixed_debit_month = date_part('month', payment.payment_date)
-        LEFT JOIN
-            fixed_credit
-            ON
-                fixed_credit.fixed_credit_year = date_part('year', payment.payment_date)
-            AND
-                fixed_credit.fixed_credit_month = date_part('month', payment.payment_date)
         WHERE status=0 AND active=true
         GROUP BY
             date_part('year', payment.payment_date),
             date_part('month', payment.payment_date),
             debit_total,
-            credit_total,
-            fixed_debit_total,
-            fixed_credit_total
+            credit_total
         ORDER BY payment_year, payment_month;
         """
 
@@ -328,8 +281,8 @@ def report_payment_view(request, user):
 
     open = [{
         'label': str(math.trunc(data[0])) + '/' + str(math.trunc(data[1])),
-        'debit': data[2] or 0 + fixed_debit[0],
-        'credit': data[3] or 0 + fixed_credit[0]
+        'debit': data[2],
+        'credit': data[3]
     } for data in datas_open]
 
     query_closed = """
@@ -401,24 +354,11 @@ def report_payment_view(request, user):
         'credit': data[3]
     } for data in datas_closed]
 
-    all = copy.deepcopy(open)
-
-    for payment_closed in closed.copy():
-        duplicate_payment = filter(lambda payment: payment['label'] == payment_closed['label'], all)
-        duplicate_payment_list = list(duplicate_payment)
-        if duplicate_payment_list:
-            print(duplicate_payment_list[0])
-            print(payment_closed)
-            index = all.index(duplicate_payment_list[0])
-            new_payment = duplicate_payment_list[0]
-            new_payment['debit'] += payment_closed['debit']
-            new_payment['credit'] += payment_closed['credit']
-            all[index] = new_payment
-        else:
-            all.append(payment_closed)
-
     return JsonResponse({
-        'open': open,
-        'closed': closed,
-        'all': all
+        'data': {
+            'open': open,
+            'closed': closed,
+            'fixed_debit': fixed_debit,
+            'fixed_credit': fixed_credit
+        }
     })
