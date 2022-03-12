@@ -1,16 +1,18 @@
-import math
-from django.http import JsonResponse
-from django.views.decorators.http import require_GET, require_POST
-from financial.utils import calculate_installments
-from rmp.decorators import add_cors_react_dev, validate_user
-from django.views.decorators.csrf import csrf_exempt
 import json
-from financial.models import Payment
+import math
+import copy
 from datetime import datetime, timedelta
+
 from dateutil.relativedelta import relativedelta
 from django.db import connection
-
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST
+from rmp.decorators import add_cors_react_dev, validate_user
 from rmp.utils import boolean, format_date
+
+from financial.models import Payment
+from financial.utils import calculate_installments
 
 
 @add_cors_react_dev
@@ -191,6 +193,30 @@ def payoff_detail_view(request, id, user):
 @require_GET
 def report_payment_view(request, user):
 
+    query_fixed_debit = """
+        SELECT
+            SUM(value) as fixed_debit_total
+        FROM
+            financial_payment AS fixed_debit
+        WHERE type=1 AND status=0 AND active=true AND fixed=true;
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query_fixed_debit)
+        fixed_debit = cursor.fetchone()
+
+    query_fixed_credit = """
+        SELECT
+            SUM(value) as fixed_credit_total
+        FROM
+            financial_payment AS fixed_credit
+        WHERE type=0 AND status=0 AND active=true AND fixed=true;
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query_fixed_credit)
+        fixed_credit = cursor.fetchone()
+
     queryOpen = """
         WITH debit AS (
             SELECT
@@ -298,17 +324,15 @@ def report_payment_view(request, user):
 
     with connection.cursor() as cursor:
         cursor.execute(queryOpen)
-        datasOpen = cursor.fetchall()
+        datas_open = cursor.fetchall()
 
     open = [{
         'label': str(math.trunc(data[0])) + '/' + str(math.trunc(data[1])),
-        'debit': data[2],
-        'credit': data[3],
-        'fixed_debit': data[4],
-        'fixed_credit': data[5]
-    } for data in datasOpen]
+        'debit': data[2] or 0 + fixed_debit[0],
+        'credit': data[3] or 0 + fixed_credit[0]
+    } for data in datas_open]
 
-    queryClosed = """
+    query_closed = """
         WITH debit AS (
             SELECT
                 SUM(value) as debit_total,
@@ -368,83 +392,30 @@ def report_payment_view(request, user):
         """
 
     with connection.cursor() as cursor:
-        cursor.execute(queryClosed)
-        datasClosed = cursor.fetchall()
+        cursor.execute(query_closed)
+        datas_closed = cursor.fetchall()
 
     closed = [{
         'label': str(math.trunc(data[0])) + '/' + str(math.trunc(data[1])),
         'debit': data[2],
         'credit': data[3]
-    } for data in datasClosed]
+    } for data in datas_closed]
 
-    queryAll = """
-        WITH debit AS (
-            SELECT
-                SUM(value) as debit_total,
-                date_part('year', debit.payment_date) as debit_year,
-                date_part('month', debit.payment_date) as debit_month
-            FROM
-                financial_payment AS debit
-            WHERE type=1 AND active=true
-            GROUP BY
-                date_part('year', debit.payment_date),
-                date_part('month', debit.payment_date)
-            ORDER BY
-                date_part('year', debit.payment_date),
-                date_part('month', debit.payment_date)
-        ),
-        credit AS (
-            SELECT
-                SUM(value) as credit_total,
-                date_part('year', credit.payment_date) as credit_year,
-                date_part('month', credit.payment_date) as credit_month
-            FROM
-                financial_payment AS credit
-            WHERE type=0 AND active=true
-            GROUP BY
-                date_part('year', credit.payment_date),
-                date_part('month', credit.payment_date)
-            ORDER BY
-                date_part('year', credit.payment_date),
-                date_part('month', credit.payment_date)
-        )
-        SELECT
-            date_part('month', payment.payment_date) AS payment_month,
-            date_part('year', payment.payment_date) AS payment_year,
-            debit.debit_total as debit_total,
-            credit.credit_total as credit_total
-        FROM
-            financial_payment AS payment
-        LEFT JOIN
-            debit
-            ON
-                debit.debit_year = date_part('year', payment.payment_date)
-            AND
-                debit.debit_month = date_part('month', payment.payment_date)
-        LEFT JOIN
-            credit
-            ON
-                credit.credit_year = date_part('year', payment.payment_date)
-            AND
-                credit.credit_month = date_part('month', payment.payment_date)
-        WHERE active=true
-        GROUP BY
-            date_part('year', payment.payment_date),
-            date_part('month', payment.payment_date),
-            debit_total,
-            credit_total
-        ORDER BY payment_year, payment_month;
-        """
+    all = copy.deepcopy(open)
 
-    with connection.cursor() as cursor:
-        cursor.execute(queryAll)
-        datasAll = cursor.fetchall()
-
-    all = [{
-        'label': str(math.trunc(data[0])) + '/' + str(math.trunc(data[1])),
-        'debit': data[2],
-        'credit': data[3]
-    } for data in datasAll]
+    for payment_closed in closed.copy():
+        duplicate_payment = filter(lambda payment: payment['label'] == payment_closed['label'], all)
+        duplicate_payment_list = list(duplicate_payment)
+        if duplicate_payment_list:
+            print(duplicate_payment_list[0])
+            print(payment_closed)
+            index = all.index(duplicate_payment_list[0])
+            new_payment = duplicate_payment_list[0]
+            new_payment['debit'] += payment_closed['debit']
+            new_payment['credit'] += payment_closed['credit']
+            all[index] = new_payment
+        else:
+            all.append(payment_closed)
 
     return JsonResponse({
         'open': open,
