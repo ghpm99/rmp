@@ -111,3 +111,12 @@ def mouse_scroll_view(request, user):
     value = data.get('value')
     pusher.mouse_scroll(value)
     return JsonResponse({'msg': 'Ok'})
+
+
+def mouse_move_and_button(request, user):
+    data = json.loads(request.body)
+    x = data.get('x')
+    y = data.get('y')
+    button = data.get('button')
+    pusher.mouse_move_button(x, y, button)
+    return JsonResponse({'msg': 'Ok'})

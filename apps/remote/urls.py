@@ -10,4 +10,5 @@ urlpatterns = [
     path('mouse-button', views.mouse_button_view, name='api_remote_mouse_button'),
     path('save-screenshot', views.save_screenshot_view, name='api_remote_save_screenshot'),
     path('mouse_scroll', views.mouse_scroll_view, name='api_remote_mouse_scroll'),
+    path('mouse-move-and-button', views.mouse_move_and_button, name='api_remote_mouse_move_and_click'),
 ]

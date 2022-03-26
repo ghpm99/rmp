@@ -90,3 +90,7 @@ def notify_screenshot():
 
 def mouse_scroll(value):
     pusher_client.trigger('private-display', 'scroll', {'value': value})
+
+
+def mouse_move_button(x, y, button):
+    pusher_client.trigger('private-display', 'mouse-move-button', {'x': x, 'y': y, 'button': button})
