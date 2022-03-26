@@ -113,6 +113,10 @@ def mouse_scroll_view(request, user):
     return JsonResponse({'msg': 'Ok'})
 
 
+@csrf_exempt
+@add_cors_react_dev
+@require_POST
+@validate_user
 def mouse_move_and_button(request, user):
     data = json.loads(request.body)
     x = data.get('x')
